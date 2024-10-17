@@ -7,8 +7,13 @@ addRow.addEventListener("click", function () {
     let aksiCell = newRow.insertCell(1);
     let bukuName = document.getElementById("id_buku");
     bukuName = bukuName.options[bukuName.selectedIndex].text;
+    let bukuId = document.getElementById("id_buku").value;
+    if(bukuId == "") {
+        alert("Pilih buku terlebih dahulu");
+        return false;
+    }
 
-    namaBukuCell.innerHTML = bukuName;
+    namaBukuCell.innerHTML = bukuName + "<input type='hidden' name='id_buku[]' value='"+ bukuId +"'>";
     aksiCell.innerHTML ="<button onclick='deleteRow(this)' class='btn btn-sm btn-danger'>Hapus</button>"
 });
 
