@@ -1,21 +1,19 @@
 <?php
 if (isset($_POST['simpan'])) {
-
-    $no_peminjaman = $_POST['no_peminjaman'];
-    $id_anggota = $_POST['id_anggota'];
-    $tgl_peminjaman = $_POST['tgl_peminjaman'];
-    $tgl_pengembalian = $_POST['tgl_pengembalian'];
-    $id_buku = $_POST['id_buku'];
-    $status = "Di Pinjam";
-
-    $insert = mysqli_query($koneksi, "INSERT INTO peminjaman (no_peminjaman, id_anggota, tgl_peminjaman, tgl_pengembalian, status ) VALUES ('$no_peminjaman','$id_anggota','$tgl_peminjaman','$tgl_pengembalian', '$status')");
-    $id_peminjaman = mysqli_insert_id($koneksi);
-
-    foreach ($id_buku as $key => $buku) {
-        $id_buku = $_POST['id_buku'][$key];
-        $insertDetail = mysqli_query($koneksi, "INSERT INTO detail_peminjaman (id_peminjaman, id_buku) VALUES ('$id_peminjaman','$id_buku')");
+    $id_peminjaman  = $_POST['id_peminjaman'];
+    $denda          = $_POST['denda'];
+    if($denda == 0) {
+        $status = 0;
+    } else {
+        $status = 1;
     }
-    header("location:?pg=peminjaman&tambah=berhasil");
+
+    $insert = mysqli_query($koneksi, "INSERT INTO pengembalian (id_peminjaman, status, denda ) VALUES ('$id_peminjaman','$status','$denda')");
+
+    $updatePeminjam = mysqli_query($koneksi, "UPDATE peminjaman SET status ='Di kembalikan' WHERE id='$id_peminjaman'");
+    
+    header("location:?pg=pengembalian&tambah=berhasil");
+
 }
 
 $id = isset($_GET['detail']) ? $_GET['detail'] : '';
@@ -80,6 +78,10 @@ $queryKodePnjm = mysqli_query($koneksi, "SELECT * FROM peminjaman WHERE status =
                                                 <label for="" class="form-label">Tanggal Peminjaman</label>
                                                 <input type="text" readonly id="tgl_peminjaman" class="form-control">
                                             </div>
+                                            <div class="mb-3">
+                                                <label for="" class="form-label">Denda</label>
+                                                <input type="text" readonly name="denda" id="denda" class="form-control">
+                                            </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="mb-3">
@@ -98,40 +100,20 @@ $queryKodePnjm = mysqli_query($koneksi, "SELECT * FROM peminjaman WHERE status =
                     </div>
 
 
-                    <!-- table data dari query dengan php -->
-                    <?php if (isset($_GET['detail'])): ?>
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Nama Buku</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php $no = 1;
-                                while ($rowDetailPeminjaman = mysqli_fetch_assoc($queryDetailPinjam)): ?>
-                                    <tr>
-                                        <td><?php echo $no++; ?></td>
-                                        <td><?php echo $rowDetailPeminjaman['nama_buku'] ?></td>
-                                    </tr>
-                                <?php endwhile; ?>
-                            </tbody>
-                        </table>
-                    <?php else: ?>
-                        <table id="table" class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Nama Buku</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody class="table-row">
-                            </tbody>
-                        </table>
-                        <div class="mt-3">
-                            <button type="submit" name="simpan" class="btn btn-primary">Simpan</button>
-                        </div>
-                    <?php endif; ?>
+                    <!-- table data dari js -->
+                    <table id="table-pengembalian" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Nama Buku</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-row">
+                        </tbody>
+                    </table>
+                    <div class="mt-3">
+                        <button type="submit" name="simpan" class="btn btn-primary">Simpan</button>
+                    </div>
+
                 </form>
             </fieldset>
         </div>
